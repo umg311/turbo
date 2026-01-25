@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Racing Flags Quiz | ISC-DIP Turbo</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --navy: #0a1128;
+    --electric-blue: #0066cc;
+    --gold: #ffcc00;
+    --light-blue: #00a8e8;
+    --dark-navy: #051024;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(
+        rgba(5,16,36,0.9),
+        rgba(5,16,36,0.95)
+    ), url("flag.jfif");
+    background-size: cover;
+    background-position: center;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quiz-container {
+    width: 90%;
+    max-width: 650px;
+    background: linear-gradient(145deg, var(--dark-navy), var(--navy));
+    border-radius: 18px;
+    padding: 40px;
+    border: 1px solid rgba(0,102,204,0.4);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    text-align: center;
+}
+
+.quiz-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.4rem;
+    margin-bottom: 12px;
+    background: linear-gradient(to right, var(--gold), var(--light-blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.quiz-subtitle {
+    color: #cccccc;
+    margin-bottom: 30px;
+    font-size: 1.05rem;
+}
+
+.question {
+    font-size: 1.4rem;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.answers {
+    display: grid;
+    gap: 14px;
+}
+
+.answer-btn {
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 2px solid rgba(0,102,204,0.4);
+    background: rgba(255,255,255,0.03);
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.answer-btn:hover {
+    background: rgba(0,102,204,0.25);
+    box-shadow: 0 0 12px rgba(0,102,204,0.4);
+}
+
+.answer-btn.correct {
+    background: rgba(255,204,0,0.2);
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 0 15px rgba(255,204,0,0.7);
+}
+
+.answer-btn.wrong {
+    background: rgba(220,38,38,0.25);
+    border-color: #dc2626;
+}
+
+.next-btn {
+    margin-top: 30px;
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: 2px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.next-btn:hover {
+    background: var(--gold);
+    color: var(--navy);
+    box-shadow: 0 0 20px rgba(255,204,0,0.7);
+}
+
+.score-text {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #cccccc;
+}
+
+.back-link {
+    margin-top: 25px;
+    display: inline-block;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: var(--light-blue);
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+</style>
+</head>
+
+<body>
+
+<div class="quiz-container">
+    <div class="quiz-title">Motorsport Flags Quiz</div>
+    <div class="quiz-subtitle"></div>
+
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+
+    <button class="next-btn" id="nextBtn">NEXT</button>
+    <div class="score-text" id="scoreText"></div>
+
+    <a href="index.html" class="back-link">← Back to Home</a>
+</div>
+
+<script>
+const questions = [
+    {
+        q: "What does the yellow flag indicate?",
+        a: [
+            { t: "Race stopped", c: false },
+            { t: "Danger ahead, no overtaking", c: true },
+            { t: "Driver penalty", c: false },
+            { t: "End of race", c: false }
+        ]
+    },
+    {
+        q: "What does the red flag mean?",
+        a: [
+            { t: "Slower car ahead", c: false },
+            { t: "Session stopped", c: true },
+            { t: "Mechanical failure", c: false },
+            { t: "Final lap", c: false }
+        ]
+    },
+    {
+        q: "What does the blue flag warn drivers about?",
+        a: [
+            { t: "Rain approaching", c: false },
+            { t: "Faster car trying to lap you", c: true },
+            { t: "Pit lane open", c: false },
+            { t: "Track limits", c: false }
+        ]
+    },
+    {
+        q: "What does a furled black flag mean?",
+        a: [
+            { t: "Final lap", c: false },
+            { t: "Danger on track", c: false },
+            { t: "Driver has done something to upset the marshals", c: true },
+            { t: "Penalty issued", c: false }
+        ]
+    },
+    
+];
+
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const nextBtn = document.getElementById("nextBtn");
+const scoreText = document.getElementById("scoreText");
+
+let index = 0;
+let score = 0;
+let userAnswers = [];
+
+
+function loadQuestion() {
+    nextBtn.style.display = "none";
+    scoreText.textContent = "";
+    answersEl.innerHTML = "";
+
+    const current = questions[index];
+    questionEl.textContent = current.q;
+
+    current.a.forEach(ans => {
+        const btn = document.createElement("button");
+        btn.className = "answer-btn";
+        btn.textContent = ans.t;
+        btn.onclick = () => selectAnswer(btn, ans.c);
+        answersEl.appendChild(btn);
+    });
+}
+
+function selectAnswer(btn, correct) {
+    const selectedText = btn.textContent;
+
+    userAnswers[index] = {
+        selected: selectedText,
+        correct: correct
+    };
+
+    if (correct) {
+        btn.classList.add("correct");
+        score++;
+    } else {
+        btn.classList.add("wrong");
+    }
+
+    [...answersEl.children].forEach(b => b.disabled = true);
+    nextBtn.style.display = "inline-block";
+}
+
+function nextQuestion() {
+    index++;
+    if (index < questions.length) {
+        loadQuestion();
+    } else {
+        showScore();
+    }
+}
+
+nextBtn.onclick = nextQuestion;
+
+function showScore() {
+    questionEl.textContent = `Final Score: ${score}/${questions.length}`;
+    answersEl.innerHTML = "";
+
+    questions.forEach((q, i) => {
+        const correctAnswer = q.a.find(a => a.c).t;
+        const userAnswer = userAnswers[i];
+
+        const resultDiv = document.createElement("div");
+        resultDiv.style.marginBottom = "18px";
+        resultDiv.style.textAlign = "left";
+
+        resultDiv.innerHTML = `
+            <strong>Q${i + 1}: ${q.q}</strong><br>
+            Your answer:
+            <span style="color:${userAnswer.correct ? 'var(--gold)' : '#dc2626'}">
+                ${userAnswer.selected}
+            </span><br>
+            Correct answer:
+            <span style="color:var(--light-blue)">
+                ${correctAnswer}
+            </span>
+        `;
+
+        answersEl.appendChild(resultDiv);
+    });
+
+    scoreText.textContent =
+        score === questions.length
+        ? "You got a perfect score. NICE!"
+        : "Good enough, try again for a better score!";
+
+    nextBtn.textContent = "RESTART";
+    nextBtn.style.display = "inline-block";
+   nextBtn.onclick = () => {
+    index = 0;
+    score = 0;
+    userAnswers = [];
+    nextBtn.textContent = "NEXT";
+
+    nextBtn.onclick = nextQuestion;
+    loadQuestion();
+};
+
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
