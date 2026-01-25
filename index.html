@@ -1636,7 +1636,241 @@ tsParticles.load("particles-bg", {
 });
 </script>
 
+<!-- ========================================
+     TURBOHELP AI FLOATING CHAT WIDGET
+     ======================================== -->
 
+<!-- Floating Chat Widget -->
+<div id="turbohelp-widget">
+    <button id="turbohelp-toggle" class="turbohelp-button">
+        <span class="turbohelp-icon">🤖</span>
+        <span class="turbohelp-text">Ask TurboHelp AI</span>
+    </button>
+    
+    <div id="turbohelp-popup" class="turbohelp-popup">
+        <div class="turbohelp-header">
+            <span>⚡ TurboHelp AI Assistant</span>
+            <button id="turbohelp-close">&times;</button>
+        </div>
+        <iframe src="https://turbohelp-ai.vercel.app" frameborder="0"></iframe>
+    </div>
+</div>
+
+<style>
+/* ========================================
+   TURBOHELP FLOATING WIDGET STYLES
+   ======================================== */
+
+#turbohelp-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: 'Orbitron', 'Arial', sans-serif;
+}
+
+.turbohelp-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #0066cc, #00a8e8);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 102, 204, 0.4);
+    transition: all 0.3s ease;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(0, 102, 204, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(0, 102, 204, 0.7);
+    }
+}
+
+.turbohelp-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 102, 204, 0.6);
+}
+
+.turbohelp-button:active {
+    transform: translateY(0);
+}
+
+.turbohelp-icon {
+    font-size: 24px;
+    animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(20deg); }
+    75% { transform: rotate(-20deg); }
+}
+
+.turbohelp-text {
+    white-space: nowrap;
+}
+
+.turbohelp-popup {
+    display: none;
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 420px;
+    height: 650px;
+    background: #0a1128;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    flex-direction: column;
+    overflow: hidden;
+    border: 2px solid rgba(0, 102, 204, 0.3);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.turbohelp-popup.active {
+    display: flex;
+}
+
+.turbohelp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #0066cc, #00a8e8);
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+#turbohelp-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    line-height: 26px;
+    transition: transform 0.2s ease;
+}
+
+#turbohelp-close:hover {
+    transform: rotate(90deg);
+}
+
+.turbohelp-popup iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #0a1128;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .turbohelp-popup {
+        width: calc(100vw - 20px);
+        height: calc(100vh - 100px);
+        right: 10px;
+        left: 10px;
+        bottom: 80px;
+        max-width: none;
+    }
+    
+    .turbohelp-text {
+        display: none;
+    }
+    
+    .turbohelp-button {
+        width: 60px;
+        height: 60px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+    }
+    
+    .turbohelp-icon {
+        font-size: 28px;
+    }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .turbohelp-popup {
+        width: 380px;
+        height: 600px;
+    }
+}
+</style>
+
+<script>
+/* ========================================
+   TURBOHELP WIDGET FUNCTIONALITY
+   ======================================== */
+
+(function() {
+    const chatToggle = document.getElementById('turbohelp-toggle');
+    const chatPopup = document.getElementById('turbohelp-popup');
+    const chatClose = document.getElementById('turbohelp-close');
+
+    // Toggle popup
+    chatToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        chatPopup.classList.toggle('active');
+        
+        // Stop animation when opened
+        if (chatPopup.classList.contains('active')) {
+            chatToggle.style.animation = 'none';
+        } else {
+            chatToggle.style.animation = 'pulse-glow 2s ease-in-out infinite';
+        }
+    });
+
+    // Close popup
+    chatClose.addEventListener('click', function() {
+        chatPopup.classList.remove('active');
+        chatToggle.style.animation = 'pulse-glow 2s ease-in-out infinite';
+    });
+
+    // Close on click outside
+    document.addEventListener('click', function(e) {
+        if (!chatToggle.contains(e.target) && !chatPopup.contains(e.target)) {
+        chatPopup.classList.remove('active');
+            chatToggle.style.animation = 'pulse-glow 2s ease-in-out infinite';
+        }
+    });
+
+    // Close on ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && chatPopup.classList.contains('active')) {
+            chatPopup.classList.remove('active');
+            chatToggle.style.animation = 'pulse-glow 2s ease-in-out infinite';
+        }
+    });
+})();
+</script>
+
+<!-- END TURBOHELP WIDGET -->
 </body>
 
 </html>
+
