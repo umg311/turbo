@@ -65,7 +65,7 @@
 .nav-left {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 20px;
 }
 
 .nav-center {
@@ -77,18 +77,20 @@
 
 .nav-links {
     display: flex;
-    gap: 24px;
+    gap: 18px;
     list-style: none;
+    align-items: center;
 }
 
 .nav-links a {
     color: white;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     position: relative;
+    white-space: nowrap;
 }
 
 
@@ -156,44 +158,67 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 25px 30px;
+    background: linear-gradient(135deg, rgba(0, 102, 204, 0.15), rgba(0, 168, 232, 0.1));
+    border: 2px solid rgba(0, 168, 232, 0.3);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .evgp-label {
-    font-size: 0.6rem;
-    letter-spacing: 1.5px;
-    color: #aaa;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: #00a8e8;
     text-transform: uppercase;
+    margin-bottom: 15px;
+    font-weight: 600;
 }
 
 .countdown-inline {
     display: flex;
-    gap: 14px;
+    gap: 20px;
 }
 
 .countdown-inline div {
     display: flex;
-    align-items: baseline;
-    gap: 3px;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
 }
 
 .countdown-inline span {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 900;
+    font-family: 'Orbitron', sans-serif;
     color: var(--gold);
-    min-width: 22px;
-    text-align: right;
+    line-height: 1;
+    margin-bottom: 5px;
 }
 
 .countdown-inline small {
-    font-size: 0.6rem;
-    color: #bbb;
-    letter-spacing: 0.5px;
+    font-size: 0.7rem;
+    color: #aaa;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-/*for mobile ppl*/
-@media (max-width: 900px) {
+/*for mobile countdown*/
+@media (max-width: 768px) {
     .evgp-countdown {
-        display: none;
+        padding: 20px;
+    }
+    
+    .countdown-inline {
+        gap: 15px;
+    }
+    
+    .countdown-inline div {
+        min-width: 50px;
+    }
+    
+    .countdown-inline span {
+        font-size: 1.5rem;
     }
 }
 
@@ -270,7 +295,7 @@
         .nav-game-link {
             background: linear-gradient(135deg, rgba(255, 204, 0, 0.15), rgba(255, 153, 0, 0.1)) !important;
             border-radius: 5px;
-            padding: 6px 12px !important;
+            padding: 4px 10px !important;
             transition: all 0.3s ease !important;
         }
         
@@ -1173,28 +1198,17 @@ footer {
 
     
     <div class="nav-center">
-      <div class="evgp-countdown">
-        <span class="evgp-label">Countdown to EVGP</span>
-        <div class="countdown-inline">
-          <div><span id="days">30</span><small>d</small></div>
-          <div><span id="hours">04</span><small>h</small></div>
-          <div><span id="minutes">49</span><small>m</small></div>
-          <div><span id="seconds">47</span><small>s</small></div>
-        </div>
-      </div>
+      <ul class="nav-links" id="mobileMenu">
+        <li><a href="#" class="nav-link" data-target="home">Home</a></li>
+        <li><a href="#mission" class="scroll-link">Mission</a></li>
+        <li><a href="#goals" class="scroll-link">Goals</a></li>
+        <li><a href="team.html">Crew</a></li>
+        <li><a href="#footer" class="scroll-link">Contact</a></li>
+        <li><a href="journey.html">Timeline</a></li>
+        <li><a href="chatbot.html" target="_blank">TurboAI</a></li>
+        <li><a href="turbo-racer.html" class="nav-game-link">🎮 Turbo Racer</a></li>
+      </ul>
     </div>
-
-    
-    <ul class="nav-links" id="mobileMenu">
-    <li><a href="#" class="nav-link" data-target="home">Home</a></li>
-    <li><a href="#mission" class="scroll-link">Mission</a></li>
-    <li><a href="#goals" class="scroll-link">Goals</a></li>
-    <li><a href="team.html">Crew</a></li>
-    <li><a href="#footer" class="scroll-link">Contact</a></li>
-    <li><a href="journey.html">Timeline</a></li>
-    <li><a href="chatbot.html" target="_blank">TurboAI</a></li>
-    <li><a href="turbo-racer.html" class="nav-game-link">🎮 Turbo Racer</a></li>
-</ul>
 
 
     <div class="menu-toggle" id="menuToggle">
@@ -1218,6 +1232,17 @@ footer {
     Chat with TurboHelp AI!
   </a>
 </div>
+
+      <!-- Countdown Timer -->
+      <div class="evgp-countdown" style="margin-top: 40px;">
+        <span class="evgp-label">Countdown to EVGP</span>
+        <div class="countdown-inline">
+          <div><span id="days">30</span><small>d</small></div>
+          <div><span id="hours">04</span><small>h</small></div>
+          <div><span id="minutes">49</span><small>m</small></div>
+          <div><span id="seconds">47</span><small>s</small></div>
+        </div>
+      </div>
 
     </div>
   </div>
