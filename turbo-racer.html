@@ -370,6 +370,186 @@
             box-shadow: 0 15px 40px rgba(0, 102, 204, 0.7);
         }
 
+        /* Start Screen Modal */
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .start-screen.hidden {
+            display: none;
+        }
+
+        .start-content {
+            background: linear-gradient(135deg, rgba(10, 17, 40, 0.98), rgba(5, 16, 36, 0.98));
+            padding: clamp(40px, 6vw, 60px);
+            border-radius: 25px;
+            border: 3px solid #ffcc00;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 
+                0 30px 90px rgba(0, 0, 0, 0.9),
+                0 0 100px rgba(255, 204, 0, 0.5);
+            animation: startSlide 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes startSlide {
+            from {
+                transform: scale(0.8) translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .start-icon {
+            font-size: clamp(4rem, 10vw, 6rem);
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 30px rgba(255, 204, 0, 0.6));
+            animation: iconBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .start-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 7vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffcc00 0%, #00a8e8 50%, #0066cc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+            text-shadow: 0 0 40px rgba(255, 204, 0, 0.3);
+        }
+
+        .start-subtitle {
+            color: #ffcc00;
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .start-description {
+            color: #aaa;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            line-height: 1.8;
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .start-btn {
+            padding: clamp(15px, 4vw, 20px) clamp(40px, 8vw, 60px);
+            background: linear-gradient(135deg, #ffcc00, #ff9900);
+            border: none;
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            font-weight: 900;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 10px 30px rgba(255, 204, 0, 0.5),
+                0 0 40px rgba(255, 204, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .start-btn:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 15px 40px rgba(255, 204, 0, 0.7),
+                0 0 60px rgba(255, 204, 0, 0.5);
+        }
+
+        .start-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .start-tips {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 102, 204, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(0, 102, 204, 0.3);
+        }
+
+        .start-tips h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #00a8e8;
+            margin-bottom: 15px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            text-align: left;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .tip-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .tip-text {
+            color: #ccc;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            line-height: 1.5;
+        }
+
+        .tip-text strong {
+            color: #ffcc00;
+        }
+
         .item-legend {
             position: absolute;
             top: 10px;
@@ -478,6 +658,44 @@
     </style>
 </head>
 <body>
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <div class="start-content">
+            <div class="start-icon">🏎️⚡</div>
+            <h1 class="start-title">TURBO RACER</h1>
+            <p class="start-subtitle">Electric Speed Challenge</p>
+            <p class="start-description">
+                Think you're ready for the EVGP? Test your reflexes and battery management 
+                skills in this high-speed electric racing challenge!
+            </p>
+            <button class="start-btn" onclick="startGame()">
+                <span>⚡ START RACE</span>
+            </button>
+            
+            <div class="start-tips">
+                <h3>🎯 Quick Tips</h3>
+                <div class="tips-grid">
+                    <div class="tip-item">
+                        <div class="tip-icon">⚡</div>
+                        <div class="tip-text">Collect <strong>batteries</strong> to keep racing</div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-icon">🛡️</div>
+                        <div class="tip-text">Use <strong>shields</strong> to destroy obstacles</div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-icon">🚗</div>
+                        <div class="tip-text">Dodge red cars and collect power-ups</div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-icon">💎</div>
+                        <div class="tip-text">Grab <strong>gems</strong> for bonus points</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="bg-grid"></div>
     <canvas class="particles" id="particles"></canvas>
 
@@ -600,7 +818,7 @@
         const fixedDeltaTime = 1000 / 60; // Target 60fps logic
 
         // Game state
-        let gameRunning = true;
+        let gameRunning = false;  // Start paused until player clicks start
         let score = 0;
         let battery = 100;
         
@@ -987,6 +1205,17 @@
             if (modal) modal.classList.add('show');
         }
 
+        function startGame() {
+            // Hide start screen
+            document.getElementById('startScreen').classList.add('hidden');
+            
+            // Start the game
+            gameRunning = true;
+            lastTime = performance.now();
+            accumulator = 0;
+            gameLoop();
+        }
+
         function restartGame() {
             gameRunning = true;
             score = 0;
@@ -1010,7 +1239,9 @@
 
         // Initialize
         document.getElementById('highScoreDisplay').textContent = highScore;
-        gameLoop();
+        
+        // Don't start game automatically - wait for start button
+        // gameLoop will be called when user clicks "START RACE"
     </script>
 </body>
 </html>
