@@ -1636,10 +1636,263 @@ tsParticles.load("particles-bg", {
 });
 </script>
 
+<style>
+    /* Popup Overlay */
+    .turbo-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        animation: fadeIn 0.3s ease;
+    }
 
+    .turbo-popup-overlay.active {
+        display: flex;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Popup Container */
+    .turbo-popup {
+        background: linear-gradient(135deg, rgba(10, 17, 40, 0.98), rgba(5, 16, 36, 0.98));
+        border: 3px solid rgba(255, 204, 0, 0.6);
+        border-radius: 25px;
+        padding: 40px;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+        position: relative;
+        box-shadow: 
+            0 30px 90px rgba(0, 0, 0, 0.9),
+            0 0 100px rgba(255, 204, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        animation: popupSlide 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes popupSlide {
+        from {
+            transform: scale(0.8) translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Close Button */
+    .turbo-popup-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 51, 51, 0.2);
+        border: 2px solid rgba(255, 51, 51, 0.5);
+        color: #ff3333;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-weight: bold;
+    }
+
+    .turbo-popup-close:hover {
+        background: rgba(255, 51, 51, 0.4);
+        border-color: #ff3333;
+        transform: rotate(90deg);
+    }
+
+    /* Popup Content */
+    .turbo-popup-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 0 20px rgba(255, 204, 0, 0.6));
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .turbo-popup-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #ffcc00 0%, #00a8e8 50%, #0066cc 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 15px;
+        text-shadow: 0 0 40px rgba(255, 204, 0, 0.3);
+    }
+
+    .turbo-popup-text {
+        color: #aaa;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    .turbo-popup-highlight {
+        color: #ffcc00;
+        font-weight: 700;
+    }
+
+    /* Play Button */
+    .turbo-popup-btn {
+        background: linear-gradient(135deg, #ffcc00, #ff9900);
+        color: #000;
+        border: none;
+        padding: 18px 50px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 900;
+        border-radius: 15px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 
+            0 10px 30px rgba(255, 204, 0, 0.5),
+            0 0 40px rgba(255, 204, 0, 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .turbo-popup-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .turbo-popup-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .turbo-popup-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 
+            0 15px 40px rgba(255, 204, 0, 0.7),
+            0 0 60px rgba(255, 204, 0, 0.5);
+    }
+
+    .turbo-popup-btn span {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .turbo-popup {
+            padding: 30px 20px;
+            max-width: 90%;
+        }
+
+        .turbo-popup-title {
+            font-size: 1.5rem;
+        }
+
+        .turbo-popup-text {
+            font-size: 1rem;
+        }
+
+        .turbo-popup-btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+        }
+
+        .turbo-popup-icon {
+            font-size: 3rem;
+        }
+    }
+</style>
+
+<!-- Popup HTML -->
+<div class="turbo-popup-overlay" id="turboPopup">
+    <div class="turbo-popup">
+        <div class="turbo-popup-close" onclick="closeTurboPopup()">×</div>
+        <div class="turbo-popup-icon">🏎️⚡</div>
+        <h2 class="turbo-popup-title">THINK YOU'RE READY FOR THE EVGP?</h2>
+        <p class="turbo-popup-text">
+            Test your skills on <span class="turbo-popup-highlight">Turbo Racer</span> – 
+            our electric racing game designed to challenge your reflexes and battery management!
+        </p>
+        <button class="turbo-popup-btn" onclick="playTurboRacer()">
+            <span>⚡ PLAY NOW</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    // Show popup after 3 seconds on page load
+    window.addEventListener('load', function() {
+        // Check if user has seen popup today
+        const lastShown = localStorage.getItem('turboPopupShown');
+        const today = new Date().toDateString();
+        
+        if (lastShown !== today) {
+            setTimeout(function() {
+                document.getElementById('turboPopup').classList.add('active');
+                localStorage.setItem('turboPopupShown', today);
+            }, 3000); // Show after 3 seconds
+        }
+    });
+
+    // Close popup
+    function closeTurboPopup() {
+        document.getElementById('turboPopup').classList.remove('active');
+    }
+
+    // Play game
+    function playTurboRacer() {
+        // Option 1: Open in same tab
+        window.location.href = 'turbo-racer.html';
+        
+        // Option 2: Open in new tab (uncomment to use this instead)
+        // window.open('turbo-racer.html', '_blank');
+    }
+
+    // Close popup when clicking outside
+    document.getElementById('turboPopup').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeTurboPopup();
+        }
+    });
+
+    // Close popup with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeTurboPopup();
+        }
+    });
+</script>
 </body>
 
 </html>
+
 
 
 

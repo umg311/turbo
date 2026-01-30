@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Turbo Racer | ISC-DIP Turbo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: radial-gradient(ellipse at top, #0e1b3d 0%, #060b1c 50%, #030712 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Animated background */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 102, 204, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 102, 204, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridScroll 15s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes gridScroll {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(40px); }
+        }
+
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .game-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 900px;
+            height: 100vh;
+            max-height: 900px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffcc00 0%, #00a8e8 50%, #0066cc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 40px rgba(255, 204, 0, 0.3);
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .game-subtitle {
+            color: #ffcc00;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+            font-weight: 700;
+        }
+
+        .game-wrapper {
+            background: linear-gradient(135deg, rgba(10, 17, 40, 0.95), rgba(5, 16, 36, 0.95));
+            border: 2px solid rgba(0, 102, 204, 0.4);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 80px rgba(0, 102, 204, 0.2);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 168, 232, 0.08), transparent 30%);
+            animation: rotate 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .canvas-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+        }
+
+        #gameCanvas {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
+            border: 3px solid #0066cc;
+            border-radius: 15px;
+            box-shadow: 
+                0 0 40px rgba(0, 102, 204, 0.6),
+                inset 0 0 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.2), rgba(0, 168, 232, 0.1));
+            border: 2px solid rgba(0, 102, 204, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0, 168, 232, 0.6);
+            box-shadow: 0 0 20px rgba(0, 168, 232, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .stat-label {
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            background: linear-gradient(135deg, #ffcc00 0%, #00a8e8 50%, #0066cc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffcc00, #ff9900);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .battery-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            margin-top: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+
+        .battery-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff3333, #ffcc00, #00ff00);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+
+        .controls-hint {
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 102, 204, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 102, 204, 0.2);
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        .highscore-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .highscore-trophy {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.6));
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .highscore-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .highscore-label-small {
+            font-size: 0.65rem;
+            color: #ffaa00;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+        }
+
+        .highscore-value-small {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ffcc00;
+            line-height: 1;
+            text-shadow: 
+                0 0 15px rgba(255, 204, 0, 0.6),
+                0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .highscore-value-small.new-record {
+            animation: recordPulse 0.6s ease-in-out;
+        }
+
+        @keyframes recordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .controls-hint p {
+            color: #aaa;
+            margin: 3px 0;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+        }
+
+        .controls-hint kbd {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.2), rgba(255, 204, 0, 0.1));
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Orbitron', monospace;
+            color: #ffcc00;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            margin: 0 3px;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+        }
+
+        .game-over-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: linear-gradient(135deg, rgba(10, 17, 40, 0.98), rgba(5, 16, 36, 0.98));
+            padding: clamp(30px, 5vw, 50px);
+            border-radius: 25px;
+            border: 3px solid #ffcc00;
+            text-align: center;
+            display: none;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 30px 90px rgba(0, 0, 0, 0.9),
+                0 0 100px rgba(255, 204, 0, 0.5);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 90vw;
+        }
+
+        .game-over-modal.show {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .game-over-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            background: linear-gradient(135deg, #ff3333, #ffcc00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            color: #ffcc00;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 204, 0, 0.3);
+        }
+
+        .restart-btn {
+            padding: clamp(12px, 3vw, 18px) clamp(30px, 6vw, 50px);
+            background: linear-gradient(135deg, #0066cc, #00a8e8);
+            border: none;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            font-weight: 700;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 102, 204, 0.7);
+        }
+
+        .item-legend {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.15), rgba(255, 153, 0, 0.1));
+            padding: 12px 15px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 204, 0, 0.4);
+            font-size: 0.75rem;
+            z-index: 2;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(255, 204, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .item-legend div {
+            margin: 5px 0;
+            color: #ffcc00;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-legend div::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: #ffcc00;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(255, 204, 0, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 5px;
+            }
+
+            .game-wrapper {
+                padding: 10px;
+                border-radius: 15px;
+            }
+
+            .stats-bar {
+                gap: 8px;
+                margin-top: 10px;
+            }
+
+            .stat-card {
+                padding: 8px;
+            }
+
+            .item-legend {
+                font-size: 0.6rem;
+                padding: 6px 8px;
+                top: 5px;
+                right: 5px;
+                background: linear-gradient(135deg, rgba(255, 204, 0, 0.08), rgba(255, 153, 0, 0.05));
+                border: 1px solid rgba(255, 204, 0, 0.25);
+                opacity: 0.7;
+                max-width: 90px;
+            }
+
+            .item-legend div {
+                margin: 2px 0;
+                font-size: 0.55rem;
+                gap: 4px;
+            }
+
+            .item-legend div::before {
+                width: 3px;
+                height: 3px;
+            }
+
+            .highscore-overlay {
+                top: 5px;
+                left: 5px;
+                gap: 6px;
+            }
+
+            .highscore-trophy {
+                font-size: 1.5rem;
+            }
+
+            .highscore-label-small {
+                font-size: 0.55rem;
+            }
+
+            .highscore-value-small {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .game-header {
+                margin-bottom: 8px;
+            }
+
+            .controls-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <canvas class="particles" id="particles"></canvas>
+
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">⚡ TURBO RACER</h1>
+            <p class="game-subtitle">ELECTRIC SPEED CHALLENGE</p>
+        </div>
+
+        <div class="game-wrapper">
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="400" height="600"></canvas>
+                
+                <!-- Item Legend - Top Right -->
+                <div class="item-legend">
+                    <div>⚡ Battery +10%</div>
+                    <div>🔋 Power Cell +20%</div>
+                    <div>💎 Gem +100pts</div>
+                    <div>⭐ Star +50pts</div>
+                    <div>🛡️ Shield (2s)</div>
+                </div>
+                
+                <!-- High Score - Top Left -->
+                <div class="highscore-overlay">
+                    <div class="highscore-trophy">🏆</div>
+                    <div class="highscore-info">
+                        <div class="highscore-label-small">Personal Best</div>
+                        <div class="highscore-value-small" id="highScoreDisplay">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-value" id="scoreDisplay">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Battery</div>
+                    <div class="stat-value" id="batteryDisplay">100%</div>
+                    <div class="battery-bar">
+                        <div class="battery-fill" id="batteryFill" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Speed</div>
+                    <div class="stat-value" id="speedDisplay">1x</div>
+                </div>
+            </div>
+
+            <div class="controls-hint">
+                <p>Desktop: <kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd></p>
+                <p>Mobile: Touch & drag to steer</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over-modal" id="gameOverModal">
+        <h2 class="game-over-title">RACE OVER!</h2>
+        <div class="final-score">
+            <div style="font-size: 1rem; color: #888; margin-bottom: 8px;">FINAL SCORE</div>
+            <div style="font-family: 'Orbitron'; font-size: clamp(2rem, 6vw, 3rem);" id="finalScore">0</div>
+        </div>
+        <button class="restart-btn" onclick="restartGame()">
+            ⚡ RACE AGAIN
+        </button>
+    </div>
+
+    <script>
+        // Particle background
+        const particleCanvas = document.getElementById('particles');
+        const pCtx = particleCanvas.getContext('2d');
+        particleCanvas.width = window.innerWidth;
+        particleCanvas.height = window.innerHeight;
+
+        const particles = [];
+        for (let i = 0; i < 40; i++) {
+            particles.push({
+                x: Math.random() * particleCanvas.width,
+                y: Math.random() * particleCanvas.height,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                size: Math.random() * 2
+            });
+        }
+
+        function animateParticles() {
+            pCtx.fillStyle = 'rgba(3, 7, 18, 0.05)';
+            pCtx.fillRect(0, 0, particleCanvas.width, particleCanvas.height);
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > particleCanvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > particleCanvas.height) p.vy *= -1;
+
+                pCtx.beginPath();
+                pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                pCtx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 204, 0, 0.6)' : 'rgba(0, 168, 232, 0.6)';
+                pCtx.fill();
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Game - FIXED FOR ALL REFRESH RATES AND RESOLUTIONS
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Detect mobile
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                         ('ontouchstart' in window) || 
+                         (navigator.maxTouchPoints > 0);
+
+        // Frame rate independence
+        let lastTime = performance.now();
+        let accumulator = 0;
+        const fixedDeltaTime = 1000 / 60; // Target 60fps logic
+
+        // Game state
+        let gameRunning = true;
+        let score = 0;
+        let battery = 100;
+        
+        // Resolution-independent speeds (mobile 50% faster)
+        let speedPercent = isMobile ? 0.01 : 0.0067; // Mobile: 6px @ 600px, PC: 4px @ 600px
+        let baseSpeedPercent = isMobile ? 0.01 : 0.0067;
+        let speed = speedPercent * canvas.height;
+        
+        let speedMultiplier = 1;
+        let shieldActive = false;
+        let shieldTime = 0;
+        let highScore = localStorage.getItem('turboRacerHighScore') || 0;
+
+        const player = {
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 140,
+            width: 50,
+            height: 85,
+            speed: canvas.width * 0.015 // 1.5% of canvas width
+        };
+
+        let obstacles = [];
+        let items = [];
+        let frameCount = 0;
+
+        // Spawn timers (in frames)
+        let obstacleTimer = 0;
+        let itemTimer = 0;
+
+        // Image loading
+        const images = {
+            car: new Image(),
+            obstacle: new Image(),
+            carLoaded: false,
+            obstacleLoaded: false
+        };
+
+        images.car.src = 'car.png';
+        images.obstacle.src = 'obstacle.png';
+
+        images.car.onload = () => { images.carLoaded = true; };
+        images.obstacle.onload = () => { images.obstacleLoaded = true; };
+        images.car.onerror = () => { images.carLoaded = false; };
+        images.obstacle.onerror = () => { images.obstacleLoaded = false; };
+
+        const ITEM_TYPES = {
+            BATTERY: { emoji: '⚡', value: 10, color: '#ffcc00', points: 20 },
+            POWER_CELL: { emoji: '🔋', value: 20, color: '#00ff88', points: 50 },
+            GEM: { emoji: '💎', value: 0, color: '#00d4ff', points: 100 },
+            STAR: { emoji: '⭐', value: 0, color: '#ffaa00', points: 50 },
+            SHIELD: { emoji: '🛡️', value: 0, color: '#0088ff', points: 75, duration: 120 }
+        };
+
+        const keys = {};
+        document.addEventListener('keydown', (e) => keys[e.key] = true);
+        document.addEventListener('keyup', (e) => keys[e.key] = false);
+
+        // Touch controls
+        let isDragging = false;
+        
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDragging = true;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const canvasX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+            player.x = canvasX - player.width / 2;
+            if (player.x < 0) player.x = 0;
+            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const canvasX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+            player.x = canvasX - player.width / 2;
+            if (player.x < 0) player.x = 0;
+            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+        });
+
+        canvas.addEventListener('touchend', (e) => { e.preventDefault(); isDragging = false; });
+        canvas.addEventListener('touchcancel', (e) => { e.preventDefault(); isDragging = false; });
+
+        function drawPlayer() {
+            if (images.carLoaded) {
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = '#0066cc';
+                ctx.drawImage(images.car, player.x, player.y, player.width, player.height);
+                ctx.shadowBlur = 0;
+                return;
+            }
+
+            if (shieldActive) {
+                ctx.save();
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = '#0088ff';
+                ctx.strokeStyle = 'rgba(0, 136, 255, 0.5)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(player.x + player.width/2, player.y + player.height/2, 50, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#0066cc';
+            const gradient = ctx.createLinearGradient(player.x, player.y, player.x, player.y + player.height);
+            gradient.addColorStop(0, '#0088ff');
+            gradient.addColorStop(0.5, '#0066cc');
+            gradient.addColorStop(1, '#004499');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(player.x + 5, player.y, player.width - 10, player.height);
+            ctx.fillStyle = 'rgba(0, 200, 255, 0.5)';
+            ctx.fillRect(player.x + 10, player.y + 15, player.width - 20, 25);
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = '#ffcc00';
+            ctx.font = 'bold 35px Arial';
+            ctx.fillStyle = '#ffcc00';
+            ctx.fillText('⚡', player.x + 7, player.y + 68);
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ffffff';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(player.x + 8, player.y + player.height - 5, 8, 3);
+            ctx.fillRect(player.x + player.width - 16, player.y + player.height - 5, 8, 3);
+            ctx.shadowBlur = 0;
+        }
+
+        function createObstacle() {
+            const x = Math.random() * (canvas.width - 50);
+            obstacles.push({ x, y: -70, width: 50, height: 70 });
+        }
+
+        function createItem() {
+            const rand = Math.random() * 100;
+            let type;
+            if (rand < 25) type = 'STAR';
+            else if (rand < 40) type = 'GEM';
+            else if (rand < 60) type = 'BATTERY';
+            else if (rand < 80) type = 'POWER_CELL';
+            else type = 'SHIELD';
+            
+            let attempts = 0, x, validPosition;
+            do {
+                x = Math.random() * (canvas.width - 35);
+                validPosition = true;
+                for (let obs of obstacles) {
+                    if (Math.abs(obs.y - (-35)) < 100 && x < obs.x + obs.width + 10 && x + 35 > obs.x - 10) {
+                        validPosition = false;
+                        break;
+                    }
+                }
+                attempts++;
+            } while (!validPosition && attempts < 10);
+            
+            if (!validPosition) return;
+            items.push({ x, y: -35, width: 35, height: 35, type });
+        }
+
+        function drawObstacles() {
+            obstacles.forEach(obs => {
+                if (images.obstacleLoaded) {
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#ff3333';
+                    ctx.drawImage(images.obstacle, obs.x, obs.y, obs.width, obs.height);
+                    ctx.shadowBlur = 0;
+                } else {
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#ff3333';
+                    const gradient = ctx.createLinearGradient(obs.x, obs.y, obs.x, obs.y + obs.height);
+                    gradient.addColorStop(0, '#ff6666');
+                    gradient.addColorStop(1, '#cc0000');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                    ctx.fillStyle = '#ffcc00';
+                    ctx.fillRect(obs.x, obs.y + 15, obs.width, 6);
+                    ctx.fillRect(obs.x, obs.y + 35, obs.width, 6);
+                    ctx.shadowBlur = 0;
+                }
+            });
+        }
+
+        function drawItems() {
+            items.forEach(item => {
+                const itemType = ITEM_TYPES[item.type];
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = itemType.color;
+                ctx.font = 'bold 32px Arial';
+                ctx.fillStyle = itemType.color;
+                ctx.fillText(itemType.emoji, item.x, item.y + 28);
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        function drawRoad() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#1a1a2e');
+            gradient.addColorStop(1, '#0f0f1e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ffcc00';
+            ctx.fillStyle = '#ffcc00';
+            for (let i = 0; i < canvas.height; i += 50) {
+                const y = (i + frameCount * speed) % canvas.height;
+                ctx.fillRect(canvas.width / 2 - 3, y, 6, 30);
+            }
+            ctx.shadowBlur = 0;
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            for (let i = 0; i < canvas.height; i += 30) {
+                const y = (i + frameCount * speed) % canvas.height;
+                ctx.fillRect(20, y, 3, 15);
+                ctx.fillRect(canvas.width - 23, y, 3, 15);
+            }
+        }
+
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        function updateGameLogic() {
+            // Player movement
+            if ((keys['ArrowLeft'] || keys['a'] || keys['A']) && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if ((keys['ArrowRight'] || keys['d'] || keys['D']) && player.x < canvas.width - player.width) {
+                player.x += player.speed;
+            }
+
+            // Move obstacles and items
+            obstacles.forEach(obs => obs.y += speed);
+            items.forEach(item => item.y += speed);
+
+            obstacles = obstacles.filter(obs => obs.y < canvas.height);
+            items = items.filter(item => item.y < canvas.height);
+
+            // Spawn obstacles (every 47 frames - 2/3 of 70)
+            obstacleTimer++;
+            if (obstacleTimer >= 47) {
+                createObstacle();
+                obstacleTimer = 0;
+            }
+
+            // Spawn items (every 75 frames)
+            itemTimer++;
+            if (itemTimer >= 75) {
+                createItem();
+                itemTimer = 0;
+            }
+
+            // Shield countdown
+            if (shieldActive) {
+                shieldTime--;
+                if (shieldTime <= 0) shieldActive = false;
+            }
+
+            // Collision with obstacles
+            obstacles.forEach(obs => {
+                if (checkCollision(player, obs)) {
+                    if (!shieldActive) {
+                        gameOver();
+                    } else {
+                        obstacles = obstacles.filter(o => o !== obs);
+                        score += 25;
+                    }
+                }
+            });
+
+            // Item collection
+            items.forEach((item, index) => {
+                if (checkCollision(player, item)) {
+                    items.splice(index, 1);
+                    const itemType = ITEM_TYPES[item.type];
+                    battery = Math.min(100, battery + itemType.value);
+                    score += itemType.points;
+                    if (item.type === 'SHIELD') {
+                        shieldActive = true;
+                        shieldTime = itemType.duration;
+                    }
+                }
+            });
+
+            // Battery drain (every 15 frames) - REDUCED to 75%
+            if (frameCount % 15 === 0) {
+                battery -= 1.125;  // Was 1.5, now 1.125 (75% of original)
+                if (battery <= 0) gameOver();
+            }
+
+            // Score increment (every 8 frames)
+            if (frameCount % 8 === 0) score += 1;
+
+            // Speed progression (every 300 frames)
+            if (frameCount % 300 === 0 && speedPercent < (baseSpeedPercent * 2.5)) {
+                speedPercent += baseSpeedPercent * 0.125;
+                speed = speedPercent * canvas.height;
+                speedMultiplier = (speedPercent / baseSpeedPercent).toFixed(1);
+            }
+
+            frameCount++;
+
+            // Update display
+            document.getElementById('scoreDisplay').textContent = Math.floor(score);
+            document.getElementById('batteryDisplay').textContent = Math.max(0, Math.round(battery)) + '%';
+            document.getElementById('speedDisplay').textContent = speedMultiplier + 'x';
+            document.getElementById('batteryFill').style.width = Math.max(0, battery) + '%';
+            
+            // Update high score
+            if (score > highScore) {
+                highScore = Math.floor(score);
+                localStorage.setItem('turboRacerHighScore', highScore);
+                document.getElementById('highScoreDisplay').textContent = highScore;
+                document.getElementById('highScoreDisplay').classList.add('new-record');
+                setTimeout(() => {
+                    document.getElementById('highScoreDisplay').classList.remove('new-record');
+                }, 600);
+            }
+        }
+
+        function draw() {
+            drawRoad();
+            drawObstacles();
+            drawItems();
+            drawPlayer();
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            const currentTime = performance.now();
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
+            // Accumulate time and run fixed timestep updates
+            accumulator += deltaTime;
+
+            // Run game logic at fixed 60fps intervals
+            while (accumulator >= fixedDeltaTime) {
+                updateGameLogic();
+                accumulator -= fixedDeltaTime;
+            }
+
+            // Draw at display refresh rate
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            const finalScore = Math.floor(score);
+            const isNewRecord = finalScore > highScore;
+            
+            if (isNewRecord && finalScore > 0) {
+                highScore = finalScore;
+                localStorage.setItem('turboRacerHighScore', highScore);
+                document.getElementById('highScoreDisplay').textContent = highScore;
+            }
+            
+            const scoreDisplay = document.querySelector('.final-score');
+            if (scoreDisplay) {
+                if (isNewRecord && finalScore > 0) {
+                    scoreDisplay.innerHTML = `
+                        <div style="font-size: 1rem; color: #888; margin-bottom: 8px;">FINAL SCORE</div>
+                        <div style="font-family: 'Orbitron'; font-size: clamp(2rem, 6vw, 3rem); color: #ffcc00;" id="finalScore">${finalScore}</div>
+                        <div style="margin-top: 15px; padding: 10px 20px; background: linear-gradient(135deg, rgba(255, 204, 0, 0.2), rgba(255, 153, 0, 0.1)); border: 2px solid rgba(255, 204, 0, 0.5); border-radius: 15px; color: #ffcc00; font-weight: 700; letter-spacing: 2px;">
+                            🏆 NEW RECORD!
+                        </div>
+                    `;
+                } else {
+                    scoreDisplay.innerHTML = `
+                        <div style="font-size: 1rem; color: #888; margin-bottom: 8px;">FINAL SCORE</div>
+                        <div style="font-family: 'Orbitron'; font-size: clamp(2rem, 6vw, 3rem); color: #ffcc00;" id="finalScore">${finalScore}</div>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: #888;">Best: ${highScore}</div>
+                    `;
+                }
+            }
+            
+            const modal = document.getElementById('gameOverModal');
+            if (modal) modal.classList.add('show');
+        }
+
+        function restartGame() {
+            gameRunning = true;
+            score = 0;
+            battery = 100;
+            speedPercent = baseSpeedPercent;
+            speed = speedPercent * canvas.height;
+            speedMultiplier = 1;
+            frameCount = 0;
+            obstacleTimer = 0;
+            itemTimer = 0;
+            obstacles = [];
+            items = [];
+            shieldActive = false;
+            shieldTime = 0;
+            player.x = canvas.width / 2 - 25;
+            lastTime = performance.now();
+            accumulator = 0;
+            document.getElementById('gameOverModal').classList.remove('show');
+            gameLoop();
+        }
+
+        // Initialize
+        document.getElementById('highScoreDisplay').textContent = highScore;
+        gameLoop();
+    </script>
+</body>
+</html>
