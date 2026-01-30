@@ -266,6 +266,20 @@
             width: 100%;
         }
         
+        /* Turbo Racer Nav Link Highlight */
+        .nav-game-link {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.15), rgba(255, 153, 0, 0.1)) !important;
+            border-radius: 5px;
+            padding: 6px 12px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .nav-game-link:hover {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.25), rgba(255, 153, 0, 0.15)) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+        }
+        
         .nav-buttons {
             display: flex;
             gap: 15px;
@@ -1179,7 +1193,7 @@ footer {
     <li><a href="#footer" class="scroll-link">Contact</a></li>
     <li><a href="journey.html">Timeline</a></li>
     <li><a href="chatbot.html" target="_blank">TurboAI</a></li>
-
+    <li><a href="turbo-racer.html" class="nav-game-link">🎮 Turbo Racer</a></li>
 </ul>
 
 
@@ -1456,7 +1470,7 @@ footer {
             </div>
             <div class="footer-social">
                 <h4>Contact Us</h4>
-                <p>Email: iscdipturbo@gmail.com</p>
+                <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a0c9d3c3c4c9d0d4d5d2c2cfe0c7cdc1c9cc8ec3cfcd">[email&#160;protected]</a></p>
            
                 <p>Address: ISC-DIP Campus, Dubai, UAE</p>
             </div>
@@ -1465,7 +1479,7 @@ footer {
     </div>
 </footer>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
       
 
    function startCountdown() {
@@ -1830,69 +1844,140 @@ tsParticles.load("particles-bg", {
     }
 </style>
 
-<!-- Popup HTML -->
-<div class="turbo-popup-overlay" id="turboPopup">
-    <div class="turbo-popup">
-        <div class="turbo-popup-close" onclick="closeTurboPopup()">×</div>
-        <div class="turbo-popup-icon">🏎️⚡</div>
-        <h2 class="turbo-popup-title">THINK YOU'RE READY FOR THE EVGP?</h2>
-        <p class="turbo-popup-text">
-            Test your skills on <span class="turbo-popup-highlight">Turbo Racer</span> – 
-            our electric racing game designed to challenge your reflexes and battery management!
-        </p>
-        <button class="turbo-popup-btn" onclick="playTurboRacer()">
-            <span>⚡ PLAY NOW</span>
-        </button>
-    </div>
+<!-- ================= TURBO RACER FLOATING BUTTON ================= -->
+<style>
+    /* Floating Button Container */
+    .turbo-float-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+        animation: floatBounce 3s ease-in-out infinite;
+    }
+
+    @keyframes floatBounce {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* Button Style */
+    .turbo-float-btn a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 25px;
+        background: linear-gradient(135deg, #ffcc00, #ff9900);
+        color: #000;
+        text-decoration: none;
+        border-radius: 50px;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 900;
+        font-size: 1rem;
+        box-shadow: 
+            0 10px 30px rgba(255, 204, 0, 0.5),
+            0 0 40px rgba(255, 204, 0, 0.3);
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 204, 0, 0.8);
+        position: relative;
+    }
+
+    .turbo-float-btn a:hover {
+        transform: scale(1.05);
+        box-shadow: 
+            0 15px 40px rgba(255, 204, 0, 0.7),
+            0 0 60px rgba(255, 204, 0, 0.5);
+        background: linear-gradient(135deg, #ffd700, #ffaa00);
+    }
+
+    /* Icon */
+    .turbo-float-icon {
+        font-size: 1.5rem;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Text */
+    .turbo-float-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        line-height: 1.2;
+    }
+
+    .turbo-float-title {
+        font-size: 0.75rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .turbo-float-game {
+        font-size: 1rem;
+        font-weight: 900;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .turbo-float-btn {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .turbo-float-btn a {
+            padding: 0;
+            width: 60px;
+            height: 60px;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .turbo-float-icon {
+            font-size: 1.8rem;
+        }
+
+        .turbo-float-text {
+            display: none;
+        }
+    }
+
+    /* Pulse effect on hover */
+    .turbo-float-btn a::before {
+        content: '';
+        position: absolute;
+        inset: -5px;
+        border-radius: 50px;
+        background: linear-gradient(135deg, #ffcc00, #ff9900);
+        opacity: 0;
+        z-index: -1;
+        transition: opacity 0.3s ease;
+    }
+
+    .turbo-float-btn a:hover::before {
+        opacity: 0.3;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.3; }
+        50% { transform: scale(1.1); opacity: 0.1; }
+    }
+</style>
+
+<!-- Floating Button HTML -->
+<div class="turbo-float-btn">
+    <a href="turbo-racer.html">
+        <span class="turbo-float-icon">🏎️</span>
+        <div class="turbo-float-text">
+            <span class="turbo-float-title">Ready for EVGP?</span>
+            <span class="turbo-float-game">Play Turbo Racer</span>
+        </div>
+    </a>
 </div>
+<!-- ================= END TURBO RACER BUTTON ================= -->
 
-<script>
-    // Show popup after 3 seconds on page load
-    window.addEventListener('load', function() {
-        // Check if user has seen popup today
-        const lastShown = localStorage.getItem('turboPopupShown');
-        const today = new Date().toDateString();
-        
-        if (lastShown !== today) {
-            setTimeout(function() {
-                document.getElementById('turboPopup').classList.add('active');
-                localStorage.setItem('turboPopupShown', today);
-            }, 3000); // Show after 3 seconds
-        }
-    });
-
-    // Close popup
-    function closeTurboPopup() {
-        document.getElementById('turboPopup').classList.remove('active');
-    }
-
-    // Play game
-    function playTurboRacer() {
-        // Option 1: Open in same tab
-        window.location.href = 'turbo-racer.html';
-        
-        // Option 2: Open in new tab (uncomment to use this instead)
-        // window.open('turbo-racer.html', '_blank');
-    }
-
-    // Close popup when clicking outside
-    document.getElementById('turboPopup').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeTurboPopup();
-        }
-    });
-
-    // Close popup with ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeTurboPopup();
-        }
-    });
-</script>
 </body>
-
 </html>
-
-
-
-
